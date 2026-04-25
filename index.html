@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Home Care Operations Study | Folksio</title>
+    
+    <!-- Fonts: Baloo Tamma 2 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Vue 3 (CDN) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Tailwind Config for Folksio Brand -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        folksio: {
+                            primary: '#1E40AF',
+                            'primary-hover': '#1E3A8A',
+                            'primary-light': '#EFF6FF',
+                            secondary: '#2563EB',
+                            accent: '#0D9488',
+                            'accent-hover': '#0f766e',
+                            'accent-light': '#F0FDFA',
+                            dark: '#0B1120', /* Deep SaaS Navy/Slate */
+                            muted: '#64748b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Baloo Tamma 2"', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'floating': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+            background-color: #F8FAFC; /* slate-50 */
+        }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.4s ease, transform 0.4s ease; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(15px); }
+        
+        /* Premium Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+        
+        /* Remove default radio/checkbox styles for custom wrappers */
+        input[type="radio"]:focus, input[type="checkbox"]:focus { outline: none; box-shadow: none; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen selection:bg-folksio-accent selection:text-white">
+
+<div id="app" class="relative min-h-screen flex flex-col">
+    
+    <!-- Dark SaaS Header -->
+    <header class="bg-folksio-dark border-b border-slate-800 pt-8 pb-32 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-12">
+                <img src="https://www.folksio.com/logo-dark.svg" alt="Folksio Logo" class="h-8 md:h-10 w-auto object-contain">
+                <div class="hidden sm:flex items-center space-x-2 text-sm font-medium text-slate-300 bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700/50">
+                    <span class="w-2 h-2 rounded-full bg-folksio-accent animate-pulse"></span>
+                    <span>Research Division</span>
+                </div>
+            </div>
+            
+            <div class="max-w-2xl">
+                <h1 class="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight tracking-tight">
+                    UK Home Care Operations & <br/>CQC Compliance
+                </h1>
+                <p class="text-lg md:text-xl text-slate-400 font-medium">Quick Reality Check (2-3 mins)</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Flow (Overlaps header for depth) -->
+    <main class="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 -mt-20 pb-20">
+        
+        <div class="bg-white rounded-2xl shadow-floating border border-slate-200 relative overflow-hidden">
+            
+            <transition name="fade" mode="out-in">
+                
+                <!-- Success State (Statically Positioned for proper height) -->
+                <div v-if="isSubmitted" class="flex flex-col items-center justify-center p-10 md:p-24 text-center min-h-[500px]">
+                    <div class="w-20 h-20 md:w-24 md:h-24 bg-folksio-accent/10 text-folksio-accent rounded-full flex items-center justify-center mb-6 ring-8 ring-folksio-accent/5">
+                        <svg class="w-10 h-10 md:w-12 md:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="text-3xl md:text-4xl font-bold text-folksio-dark mb-4 tracking-tight">Response Secured.</h3>
+                    <p class="text-slate-500 text-lg md:text-xl max-w-xl leading-relaxed mb-10">
+                        Thank you for your insights. Your input is strictly confidential and is actively shaping the future of Folksio Care.
+                    </p>
+                    <a href="https://www.folksio.com" class="inline-flex items-center justify-center px-6 py-3 border-2 border-slate-100 rounded-xl text-slate-600 font-bold hover:bg-slate-50 hover:text-folksio-primary hover:border-slate-200 transition-all active:scale-95">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        Return to Folksio.com
+                    </a>
+                </div>
+
+                <!-- Form Area Wrapper -->
+                <div v-else class="relative">
+                    
+                    <!-- Loading Overlay -->
+                    <div v-if="isSubmitting" class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center min-h-[500px]">
+                        <div class="animate-spin rounded-full h-10 w-10 border-3 border-slate-200 border-t-folksio-primary mb-4"></div>
+                        <p class="font-semibold text-folksio-dark animate-pulse">Securing your response...</p>
+                    </div>
+
+                    <!-- Context Block -->
+                    <div class="p-8 md:p-10 border-b border-slate-100 bg-slate-50/50">
+                        <div class="prose prose-slate max-w-none text-slate-600 space-y-4 text-[1.05rem] leading-relaxed font-medium">
+                            <p class="text-folksio-dark font-bold text-xl mb-6">
+                                We’re speaking with UK home care providers to understand what day-to-day operations actually look like in 2026.
+                            </p>
+                            <p>Between CQC expectations, staffing challenges, and rising costs, we know the reality isn’t always reflected in reports.</p>
+                            <p>This is a strategic approach to find out what's actually happening on the ground. It is neither a sales form nor a lengthy survey.</p>
+                            <p class="text-folksio-dark">If you have 2 minutes, we’d genuinely value your perspective. <span class="text-folksio-accent bg-folksio-accent/10 px-2 py-0.5 rounded ml-1">Everything is confidential.</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <form @submit.prevent="handleSubmit" class="p-8 md:p-10 space-y-12">
+                        <div v-for="(q, index) in questions" :key="q.id || index" class="group">
+                            
+                            <!-- Question Header -->
+                            <div class="mb-5">
+                                <label class="text-xl font-bold text-folksio-dark leading-snug flex items-start">
+                                    <span class="text-slate-300 font-bold mr-3 mt-0.5 select-none">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                                    <span>
+                                        {{ q.title }}
+                                        <span v-if="q.required" class="text-folksio-accent ml-1 text-lg" title="Required">*</span>
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            <!-- Inputs Wrapper -->
+                            <div class="pl-0 md:pl-9">
+                                
+                                <!-- Radio Inputs (Cards) -->
+                                <div v-if="q.type === 'radio'" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label v-for="option in q.options" :key="option" class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer transition-all hover:border-folksio-primary/50 hover:bg-slate-50 has-[:checked]:border-folksio-primary has-[:checked]:bg-folksio-primary/[0.03] has-[:checked]:ring-1 has-[:checked]:ring-folksio-primary">
+                                        <input type="radio" :name="q.id" :value="option" v-model="q.value" :required="q.required && q.value === '' && (!q.hasOther || q.otherValue === '')" class="w-5 h-5 text-folksio-primary border-slate-300 focus:ring-folksio-primary">
+                                        <span class="ml-3 text-slate-700 font-semibold">{{ option }}</span>
+                                    </label>
+                                    
+                                    <!-- Other Radio Option -->
+                                    <label v-if="q.hasOther" class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer transition-all hover:border-folksio-primary/50 hover:bg-slate-50 has-[:checked]:border-folksio-primary has-[:checked]:bg-folksio-primary/[0.03] has-[:checked]:ring-1 has-[:checked]:ring-folksio-primary sm:col-span-2">
+                                        <input type="radio" :name="q.id" value="__other_option__" v-model="q.value" class="w-5 h-5 text-folksio-primary border-slate-300 focus:ring-folksio-primary">
+                                        <span class="ml-3 text-slate-700 font-semibold whitespace-nowrap">Other:</span>
+                                        <input v-if="q.value === '__other_option__'" type="text" :name="`${q.id}.other_option_response`" v-model="q.otherValue" required class="ml-3 flex-1 bg-transparent border-b border-folksio-primary outline-none focus:border-folksio-primary text-folksio-dark font-medium py-1 transition-colors">
+                                    </label>
+                                </div>
+
+                                <!-- Checkbox Inputs -->
+                                <div v-else-if="q.type === 'checkbox'" class="space-y-3">
+                                    <p class="text-sm font-medium text-slate-400 mb-4 uppercase tracking-wider">Select all that apply</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <label v-for="option in q.options" :key="option" class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer transition-all hover:border-folksio-accent/50 hover:bg-slate-50 has-[:checked]:border-folksio-accent has-[:checked]:bg-folksio-accent/[0.03] has-[:checked]:ring-1 has-[:checked]:ring-folksio-accent">
+                                            <input type="checkbox" :name="q.id" :value="option" v-model="q.value" class="w-5 h-5 text-folksio-accent border-slate-300 rounded focus:ring-folksio-accent">
+                                            <span class="ml-3 text-slate-700 font-semibold">{{ option }}</span>
+                                        </label>
+
+                                        <!-- Other Checkbox Option -->
+                                        <label v-if="q.hasOther" class="relative flex items-center p-4 rounded-xl border border-slate-200 cursor-pointer transition-all hover:border-folksio-accent/50 hover:bg-slate-50 has-[:checked]:border-folksio-accent has-[:checked]:bg-folksio-accent/[0.03] has-[:checked]:ring-1 has-[:checked]:ring-folksio-accent sm:col-span-2">
+                                            <input type="checkbox" :name="q.id" value="__other_option__" v-model="q.otherSelected" class="w-5 h-5 text-folksio-accent border-slate-300 rounded focus:ring-folksio-accent">
+                                            <span class="ml-3 text-slate-700 font-semibold whitespace-nowrap">Other:</span>
+                                            <input v-if="q.otherSelected" type="text" :name="`${q.id}.other_option_response`" v-model="q.otherValue" required class="ml-3 flex-1 bg-transparent border-b border-folksio-accent outline-none focus:border-folksio-accent text-folksio-dark font-medium py-1 transition-colors">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Grid / Matrix Input -->
+                                <div v-else-if="q.type === 'grid'" class="w-full overflow-x-auto pb-4 rounded-xl border border-slate-200">
+                                    <table class="w-full text-left min-w-[600px]">
+                                        <thead class="bg-slate-50 border-b border-slate-200">
+                                            <tr>
+                                                <th class="p-4 text-slate-500 font-semibold w-1/2 uppercase tracking-wider text-sm">Priorities</th>
+                                                <th v-for="col in q.columns" :key="col" class="p-4 text-center text-slate-800 font-bold">
+                                                    {{ col }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100">
+                                            <tr v-for="(row, rIndex) in q.rows" :key="row.id" class="hover:bg-slate-50/50 transition-colors">
+                                                <td class="p-4 font-semibold text-slate-700">{{ row.label }}</td>
+                                                <td v-for="col in q.columns" :key="col" class="p-4 text-center">
+                                                    <input type="radio" :name="row.id" :value="col" v-model="row.value" :required="q.required" class="w-5 h-5 text-folksio-primary border-slate-300 focus:ring-folksio-primary cursor-pointer">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Scale 1-10 Input -->
+                                <div v-else-if="q.type === 'scale'" class="w-full pb-2">
+                                    <div class="flex justify-between items-center mb-3 text-sm font-bold text-slate-500 uppercase tracking-wider px-1">
+                                        <span>Not stressful</span>
+                                        <span>Extremely stressful</span>
+                                    </div>
+                                    <div class="flex space-x-1 sm:space-x-2 w-full">
+                                        <label v-for="n in 10" :key="n" class="relative flex-1 cursor-pointer group/scale">
+                                            <input type="radio" :name="q.id" :value="n.toString()" v-model="q.value" :required="q.required" class="peer sr-only">
+                                            <div class="h-14 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 font-bold peer-hover:border-folksio-primary peer-hover:text-folksio-primary peer-checked:bg-folksio-primary peer-checked:text-white peer-checked:border-folksio-primary transition-all peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-folksio-primary shadow-sm">
+                                                {{ n }}
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Textarea Input -->
+                                <div v-else-if="q.type === 'textarea'">
+                                    <textarea :name="q.id" v-model="q.value" :required="q.required" rows="3" placeholder="Share your perspective..." class="w-full p-4 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-folksio-primary focus:ring-1 focus:ring-folksio-primary outline-none transition-all resize-y shadow-sm font-medium text-slate-700"></textarea>
+                                </div>
+
+                                <!-- Email Input -->
+                                <div v-else-if="q.type === 'email'">
+                                    <input :type="q.type" :name="q.id" v-model="q.value" :required="q.required" placeholder="name@agency.co.uk" class="w-full p-4 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-folksio-primary focus:ring-1 focus:ring-folksio-primary outline-none transition-all shadow-sm font-medium text-slate-700">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Validation Message -->
+                        <div v-if="validationError" class="p-4 bg-red-50 text-red-700 rounded-xl border border-red-200 flex items-center shadow-sm">
+                            <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                            <span class="font-bold">{{ validationError }}</span>
+                        </div>
+
+                        <!-- Submit Area -->
+                        <div class="pt-8 mt-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="flex items-center text-sm font-medium text-slate-400">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                Secure & Confidential submission
+                            </div>
+                            <button type="submit" class="w-full md:w-auto bg-folksio-primary hover:bg-folksio-primary-hover text-white font-bold text-lg py-4 px-12 rounded-xl shadow-[0_4px_14px_0_rgba(30,64,175,0.39)] hover:shadow-[0_6px_20px_rgba(30,64,175,0.23)] transform transition-all active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-folksio-primary">
+                                Submit Insights
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </transition>
+        </div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-auto py-8 text-center text-slate-400 text-sm font-medium">
+        <p>&copy; 2026 Folksio Inc. All rights reserved.</p>
+    </footer>
+</div>
+
+<script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+        setup() {
+            const googleFormActionUrl = ref('https://docs.google.com/forms/d/e/1FAIpQLScAtXirkOa5hl4M593kz0LIMgfD1nA4jEHXcJ30lFGAbJCttw/formResponse');
+
+            const isSubmitting = ref(false);
+            const isSubmitted = ref(false);
+            const validationError = ref('');
+
+            const questions = ref([
+                {
+                    id: 'emailAddress',
+                    type: 'email',
+                    title: 'Email Address',
+                    required: true,
+                    value: ''
+                },
+                {
+                    id: 'entry.1180212739', 
+                    type: 'radio',
+                    title: 'What is your role?',
+                    options: ['Registered Manager', 'Owner / Director', 'Care Coordinator / Scheduler', 'Operations Manager'],
+                    hasOther: true,
+                    required: true,
+                    value: '',
+                    otherValue: ''
+                },
+                {
+                    id: 'entry.188226634',
+                    type: 'radio',
+                    title: 'Roughly how many service users do you support?',
+                    options: ['0-20', '21-50', '51-100', '100+'],
+                    required: true,
+                    value: ''
+                },
+                {
+                    id: 'entry.351056116',
+                    type: 'radio',
+                    title: 'How many carers does your agency employ?',
+                    options: ['1-10', '11-25', '26-50', '50+'],
+                    required: true,
+                    value: ''
+                },
+                {
+                    id: 'entry.1233609080',
+                    type: 'radio',
+                    title: 'How much do you currently spend on care management software per month?',
+                    options: ['£0 (no software)', 'Under £200', '£200-500', '£500-1,000', '£1,000+', 'Don’t know'],
+                    required: true,
+                    value: ''
+                },
+                {
+                    id: 'entry.288906287',
+                    type: 'checkbox',
+                    title: 'Which of the following do you currently use to manage care?',
+                    options: ['Birdie', 'Log my Care', 'CarePlanner / Nourish', 'Access Care Planning', 'PASS (everyLIFE)', 'CareLineLive', 'Excel / Google Sheets', 'Paper / manual'],
+                    hasOther: true,
+                    required: true,
+                    value: [],
+                    otherSelected: false,
+                    otherValue: ''
+                },
+                {
+                    id: 'entry.2032893773',
+                    type: 'checkbox',
+                    title: 'Which of these do you deal with regularly?',
+                    options: ['Missed or late visits', 'Last-minute rota changes', 'Staff shortages', 'CQC compliance / paperwork', 'Care plan updates not up to date', 'Medication / MAR tracking issues', 'Communication gaps with carers'],
+                    hasOther: true,
+                    required: true,
+                    value: [],
+                    otherSelected: false,
+                    otherValue: ''
+                },
+                {
+                    id: 'entry.822555108',
+                    type: 'textarea',
+                    title: 'What is the most frustrating part of running day-to-day operations?',
+                    required: false, 
+                    value: ''
+                },
+                {
+                    id: 'entry.643024142',
+                    type: 'radio',
+                    title: 'How often do these issues happen?',
+                    options: ['Daily', 'A few times a week', 'Weekly', 'Occasionally'],
+                    required: true,
+                    value: ''
+                },
+                {
+                    id: 'entry.1081404873',
+                    type: 'checkbox',
+                    title: 'What impact do these issues have on your service?',
+                    options: ['Increased admin time', 'Risk during CQC inspections', 'Complaints from clients/families', 'Staff stress or burnout', 'Missed revenue / inefficiency', 'Reduced care quality'],
+                    required: true,
+                    value: []
+                },
+                {
+                    id: 'entry.713743173',
+                    type: 'scale',
+                    title: 'How stressful is managing operations and compliance for you?',
+                    required: true,
+                    value: null
+                },
+                {
+                    id: 'entry.932939069',
+                    type: 'textarea',
+                    title: 'What’s missing or not working well in your current setup?',
+                    required: false,
+                    value: ''
+                },
+                {
+                    id: 'entry.2018750570',
+                    type: 'checkbox',
+                    title: 'What usually stops you from switching to a new system?',
+                    options: ['Cost concerns', 'Staff resistance to change', 'Time to train team', 'Data migration risk', 'Not sure what’s better', 'Happy with current setup'],
+                    required: true,
+                    value: []
+                },
+                {
+                    type: 'grid', 
+                    title: 'If a system could solve your biggest issues, how would you prioritise the following?',
+                    required: true,
+                    columns: ['#1', '#2', '#3'],
+                    rows: [
+                        { id: 'entry.1676345724', label: 'Saving admin time', value: null },
+                        { id: 'entry.2134941880', label: 'Better CQC compliance', value: null },
+                        { id: 'entry.1895017431', label: 'Fewer missed visits', value: null },
+                        { id: 'entry.1286755806', label: 'Easier staff coordination', value: null },
+                        { id: 'entry.1633505466', label: 'Real-time reporting', value: null },
+                        { id: 'entry.701520074', label: 'Simpler eMAR / medication', value: null },
+                        { id: 'entry.628760445', label: 'Family communication', value: null },
+                        { id: 'entry.1917873365', label: 'Finance / invoicing', value: null }
+                    ]
+                },
+                {
+                    id: 'entry.1200451664',
+                    type: 'radio',
+                    title: 'Have you actively looked at or trialled new care software in the last 12 months?',
+                    options: ['Yes', 'No', 'Currently evaluating'],
+                    required: true,
+                    value: ''
+                },
+                {
+                    id: 'entry.132039849',
+                    type: 'textarea',
+                    title: 'What would you need to feel comfortable switching to a new system?',
+                    required: false,
+                    value: ''
+                },
+                {
+                    id: 'entry.145352456',
+                    type: 'email',
+                    title: 'If you\'re open, leave your email and we’ll share insights or early access (optional)',
+                    required: false,
+                    value: ''
+                },
+                {
+                    id: 'entry.1710957211',
+                    type: 'radio',
+                    title: 'Would you be open to a 15-minute call to share more about your experience?',
+                    options: ['Yes', 'No'],
+                    required: false,
+                    value: ''
+                }
+            ]);
+
+            const handleSubmit = async () => {
+                validationError.value = '';
+                
+                // Advanced Validation
+                for (let q of questions.value) {
+                    if (q.required) {
+                        if (q.type === 'grid') {
+                            const missingRow = q.rows.find(r => !r.value);
+                            if (missingRow) {
+                                validationError.value = `Please rank all items in: "${q.title}" (Missing: ${missingRow.label})`;
+                                return;
+                            }
+                        } else if (q.type === 'checkbox' && q.value.length === 0 && !q.otherSelected) {
+                            validationError.value = `Please select at least one option for: "${q.title}"`;
+                            return;
+                        } else if (!q.value && !q.otherValue && q.type !== 'checkbox') {
+                             validationError.value = `Please answer required question: "${q.title}"`;
+                             return;
+                        }
+                    }
+                }
+
+                isSubmitting.value = true;
+
+                // Build strict payload (explicitly bypassing CSRF tokens)
+                const formData = new URLSearchParams();
+                formData.append('fvv', '1');
+                formData.append('pageHistory', '0');
+
+                questions.value.forEach(q => {
+                    if (q.type === 'grid') {
+                        q.rows.forEach(row => {
+                            if (row.value) formData.append(row.id, row.value);
+                        });
+                    } else if (q.type === 'checkbox') {
+                        if (Array.isArray(q.value)) {
+                            q.value.forEach(val => formData.append(q.id, val));
+                        }
+                        if (q.hasOther && q.otherSelected) {
+                            formData.append(q.id, '__other_option__');
+                            if (q.otherValue) formData.append(`${q.id}.other_option_response`, q.otherValue);
+                        }
+                    } else if (q.hasOther && q.value === '__other_option__') {
+                        formData.append(q.id, '__other_option__');
+                        if (q.otherValue) formData.append(`${q.id}.other_option_response`, q.otherValue);
+                    } else {
+                        if (q.value) formData.append(q.id, q.value);
+                    }
+                });
+
+                try {
+                    // Programmatic fetch using no-cors to silently push data
+                    await fetch(googleFormActionUrl.value, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: formData.toString()
+                    });
+                    
+                    isSubmitting.value = false;
+                    isSubmitted.value = true;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } catch (error) {
+                    isSubmitting.value = false;
+                    validationError.value = 'Network error during submission. Please check your connection and try again.';
+                }
+            };
+
+            return {
+                googleFormActionUrl,
+                questions,
+                isSubmitting,
+                isSubmitted,
+                validationError,
+                handleSubmit
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>
