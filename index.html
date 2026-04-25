@@ -131,8 +131,18 @@
                         </div>
                     </div>
 
-                    <!-- Form -->
-                    <form @submit.prevent="handleSubmit" class="p-8 md:p-10 space-y-12">
+                    <!-- Form using Native HTML Browser Submission -->
+                    <form 
+                        :action="googleFormActionUrl" 
+                        method="POST" 
+                        target="hidden_iframe"
+                        @submit="handleSubmit" 
+                        class="p-8 md:p-10 space-y-12"
+                    >
+                        <!-- Safe Google Forms Metadata (NO CSRF TOKENS) -->
+                        <input type="hidden" name="fvv" value="1">
+                        <input type="hidden" name="pageHistory" value="0">
+
                         <div v-for="(q, index) in questions" :key="q.id || index" class="group">
                             
                             <!-- Question Header -->
@@ -213,7 +223,7 @@
                                     <div class="flex space-x-1 sm:space-x-2 w-full">
                                         <label v-for="n in 10" :key="n" class="relative flex-1 cursor-pointer group/scale">
                                             <input type="radio" :name="q.id" :value="n.toString()" v-model="q.value" :required="q.required" class="peer sr-only">
-                                            <div class="h-14 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 font-bold peer-hover:border-folksio-primary peer-checked:bg-folksio-primary peer-checked:text-white peer-checked:border-folksio-primary transition-all peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-folksio-primary shadow-sm">
+                                            <div class="h-14 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 font-bold peer-hover:border-folksio-primary peer-hover:text-folksio-primary peer-checked:bg-folksio-primary peer-checked:text-white peer-checked:border-folksio-primary transition-all peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-folksio-primary shadow-sm">
                                                 {{ n }}
                                             </div>
                                         </label>
@@ -260,6 +270,9 @@
     <footer class="mt-auto py-8 text-center text-slate-400 text-sm font-medium">
         <p>&copy; 2026 Folksio Inc. All rights reserved.</p>
     </footer>
+
+    <!-- Google Forms Hidden Target -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" @load="handleIframeLoad"></iframe>
 </div>
 
 <script>
@@ -271,6 +284,7 @@
 
             const isSubmitting = ref(false);
             const isSubmitted = ref(false);
+            const iframeLoadedInitial = ref(true); 
             const validationError = ref('');
 
             const questions = ref([
@@ -430,74 +444,45 @@
                 }
             ]);
 
-            const handleSubmit = async () => {
+            const handleSubmit = (e) => {
                 validationError.value = '';
                 
-                // Advanced Validation
+                // Advanced Validation to catch complex structures
                 for (let q of questions.value) {
                     if (q.required) {
                         if (q.type === 'grid') {
                             const missingRow = q.rows.find(r => !r.value);
                             if (missingRow) {
+                                e.preventDefault(); // Block native submisson
                                 validationError.value = `Please rank all items in: "${q.title}" (Missing: ${missingRow.label})`;
                                 return;
                             }
                         } else if (q.type === 'checkbox' && q.value.length === 0 && !q.otherSelected) {
+                            e.preventDefault(); 
                             validationError.value = `Please select at least one option for: "${q.title}"`;
                             return;
                         } else if (!q.value && !q.otherValue && q.type !== 'checkbox') {
+                             e.preventDefault(); 
                              validationError.value = `Please answer required question: "${q.title}"`;
                              return;
                         }
                     }
                 }
 
+                // Pass validation: Allow native form to serialize DOM inputs to the iframe
                 isSubmitting.value = true;
+            };
 
-                // Build strict payload (explicitly bypassing CSRF tokens)
-                const formData = new URLSearchParams();
-                formData.append('fvv', '1');
-                formData.append('pageHistory', '0');
-
-                questions.value.forEach(q => {
-                    if (q.type === 'grid') {
-                        q.rows.forEach(row => {
-                            if (row.value) formData.append(row.id, row.value);
-                        });
-                    } else if (q.type === 'checkbox') {
-                        if (Array.isArray(q.value)) {
-                            q.value.forEach(val => formData.append(q.id, val));
-                        }
-                        if (q.hasOther && q.otherSelected) {
-                            formData.append(q.id, '__other_option__');
-                            if (q.otherValue) formData.append(`${q.id}.other_option_response`, q.otherValue);
-                        }
-                    } else if (q.hasOther && q.value === '__other_option__') {
-                        formData.append(q.id, '__other_option__');
-                        if (q.otherValue) formData.append(`${q.id}.other_option_response`, q.otherValue);
-                    } else {
-                        if (q.value) formData.append(q.id, q.value);
-                    }
-                });
-
-                try {
-                    // Programmatic fetch using no-cors to silently push data
-                    await fetch(googleFormActionUrl.value, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: formData.toString()
-                    });
-                    
-                    isSubmitting.value = false;
-                    isSubmitted.value = true;
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } catch (error) {
-                    isSubmitting.value = false;
-                    validationError.value = 'Network error during submission. Please check your connection and try again.';
+            const handleIframeLoad = () => {
+                if (iframeLoadedInitial.value) {
+                    iframeLoadedInitial.value = false;
+                    return;
                 }
+                
+                // Form response processed successfully by Google
+                isSubmitting.value = false;
+                isSubmitted.value = true;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
             return {
@@ -506,7 +491,8 @@
                 isSubmitting,
                 isSubmitted,
                 validationError,
-                handleSubmit
+                handleSubmit,
+                handleIframeLoad
             }
         }
     }).mount('#app')
